@@ -14,11 +14,10 @@ app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "abc123"
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
+toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 db.create_all()
-
-toolbar = DebugToolbarExtension(app)
 
 
 @app.route('/')
@@ -44,7 +43,7 @@ def register_user_form():
       db.session.commit()
       session['username'] = new_user.username
       flash('Welcome! Sucessfully Created Your Account!', 'success')
-      return redirect('/secret')
+      return redirect(f"/users/{new_user.username}")
 
    else: 
       return render_template('register.html', form=form)
@@ -63,10 +62,11 @@ def login_user():
       login_user = User.authenticate(username, password)
       if login_user:
          flash(f"Welcome back, {login_user.username}!", 'success')
-         session['user_id'] = login_user.id
-         return redirect('/secret')
+         session['username'] = login_user.username
+         return redirect(f"/users/{login_user.username}")
       else:
          form.username.errors = ['Invalid username/password']
+         return render_template('login.html', form=form)
 
    return render_template('login.html', form=form)
 
@@ -76,14 +76,15 @@ def login_user():
 def logout_user():
    """Logout user"""
 
-   session.pop('user_id')
+   session.pop('username')
    flash("Logged out", 'info')
    return redirect('/')
 
 
 
-@app.route('/secret')
-def secret():
+@app.route('/users/<username>')
+def secret(username):
 
-   return ('You made it!')
+   user = User.query.get(username)
+   return render_template('users/show.html', user=user)
    
