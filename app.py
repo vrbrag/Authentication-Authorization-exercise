@@ -30,6 +30,9 @@ def home_page():
 def register_user_form():
    """Register user form"""
 
+   if "username" in session:
+        return redirect(f"/users/{session['username']}")
+
    form = RegisterForm()
    if form.validate_on_submit():
       username = form.username.data
@@ -53,6 +56,9 @@ def register_user_form():
 @app.route('/login', methods=["GET", "POST"])
 def login_user():
    """Login user"""
+
+   if "username" in session:
+        return redirect(f"/users/{session['username']}")
 
    form = LoginForm()
    if form.validate_on_submit():

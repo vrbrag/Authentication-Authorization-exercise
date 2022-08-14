@@ -18,7 +18,7 @@
          <a href="/" class="navbar-brand text-light">Feedback App</a>
          <ul class="nav navbar-nav flex-row float-right">
 
-            {% if session['user_id'] %}
+            {% if 'username' in session %}
             <li class="nav-item">
                <a class="nav-link pr-3 text-light" href="/logout">Logout</a>
             </li>
