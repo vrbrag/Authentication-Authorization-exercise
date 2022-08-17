@@ -1,8 +1,9 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, User
-from forms import RegisterForm, LoginForm
+from models import connect_db, db, User, Feedback
+from forms import RegisterForm, LoginForm, FeedbackForm, DeleteForm
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import Unauthorized
 # EXCEPT INTEGRITY ERROR - to show error when username already exists
 # see registration route
 from sqlalchemy.exc import InternalError
@@ -43,7 +44,12 @@ def register_user_form():
 
       new_user = User.register(username, password, email, first_name, last_name)
       db.session.add(new_user)
-      db.session.commit()
+      try:
+            db.session.commit()
+      except IntegrityError:
+            form.username.errors.append('Username taken. Please pick another.')
+            return render_template('register.html', form=form)
+
       session['username'] = new_user.username
       flash('Welcome! Sucessfully Created Your Account!', 'success')
       return redirect(f"/users/{new_user.username}")
@@ -89,8 +95,50 @@ def logout_user():
 
 
 @app.route('/users/<username>')
-def secret(username):
+def show_user_info(username):
+
+   if "username" not in session or username != session['username']:
+        raise Unauthorized()
 
    user = User.query.get(username)
-   return render_template('users/show.html', user=user)
+   form = DeleteForm()
+   return render_template('users/show.html', user=user, form=form)
+
+
+
+@app.route('/users/<username>/delete', methods=["POST"])
+def remove_user(username):
+   """Remove user and redirect to login"""
+
+   if "username" not in session or username != session['username']:
+      raise Unauthorized()
+
+   user = User.query.get(username)
+   db.session.delete(user)
+   db.session.commit()
+   return redirect('/login')
+
+
+
+@app.route('/users/<username>/feedback/add', methods=["GET","POST"])
+def add_feedback(username):
+   """Form to add feedback; handle form submission"""
    
+   if "username" not in session or username != session['username']:
+      raise Unauthorized()
+
+  
+
+   form = FeedbackForm()
+   if form.validate_on_submit():
+      title = form.title.data
+      content = form.content.data
+
+      feedback = Feedback(title=title, content=content, username=username)
+
+      db.session.add(feedback)
+      db.session.commit()
+      return redirect(f"/users/{feedback.username}")
+
+   else:
+      return render_template("feedback/add.html", form=form)
