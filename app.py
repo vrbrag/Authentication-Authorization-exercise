@@ -98,7 +98,8 @@ def logout_user():
 def show_user_info(username):
 
    if "username" not in session or username != session['username']:
-        raise Unauthorized()
+      #   raise Unauthorized()
+      return redirect('/401')
 
    user = User.query.get(username)
    form = DeleteForm()
@@ -111,7 +112,8 @@ def remove_user(username):
    """Remove user and redirect to login"""
 
    if "username" not in session or username != session['username']:
-      raise Unauthorized()
+      #   raise Unauthorized()
+      return redirect('/401')
 
    user = User.query.get(username)
    db.session.delete(user)
@@ -125,7 +127,8 @@ def add_feedback(username):
    """Form to add feedback; handle form submission"""
    
    if "username" not in session or username != session['username']:
-      raise Unauthorized()
+      #   raise Unauthorized()
+      return redirect('/401')
 
   
 
@@ -153,7 +156,8 @@ def update_feedback(feedback_id):
 
    feedback = Feedback.query.get(feedback_id)
    if "username" not in session or feedback.username != session['username']:
-        raise Unauthorized()
+        #   raise Unauthorized()
+      return redirect('/401')
         
    form = FeedbackForm(obj=feedback)
 
@@ -177,9 +181,18 @@ def delete_feedback(feedback_id):
    feedback = Feedback.query.get(feedback_id)
 
    if "username" not in session or feedback.username != session["username"]:
-      raise Unauthorized()
+      #   raise Unauthorized()
+      return redirect('/401')
 
    db.session.delete(feedback)
    db.session.commit()
    return redirect(f'/users/{feedback.username}')
       
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(401)
+def page_not_found(e):
+    return render_template('401.html'), 401
