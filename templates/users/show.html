@@ -11,7 +11,7 @@
       <ul>
          {% for feedback in user.feedback %}
          <li>
-            {{feedback.title}}
+            {{feedback.title}} -
             <small>
                {{feedback.content}}
             </small>
@@ -19,10 +19,10 @@
 
          <form>
             {{form.hidden_tag()}}
-            <button class="btn btn-primary" formmethod="GET" formaction="/feedback/{{ feedback.id }}/update">
+            <button class="btn btn-sm btn-primary" formmethod="GET" formaction="/feedback/{{ feedback.id }}/update">
                Edit
             </button>
-            <button class="btn btn-danger" formmethod="POST" formaction="/feedback/{{ feedback.id }}/delete">
+            <button class="btn btn-sm btn-danger" formmethod="POST" formaction="/feedback/{{ feedback.id }}/delete">
                Delete
             </button>
          </form>
