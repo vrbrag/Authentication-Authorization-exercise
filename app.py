@@ -99,7 +99,7 @@ def show_user_info(username):
 
    if "username" not in session or username != session['username']:
       #   raise Unauthorized()
-      return redirect('/401')
+      return redirect('/404')
 
    user = User.query.get(username)
    form = DeleteForm()
@@ -113,7 +113,7 @@ def remove_user(username):
 
    if "username" not in session or username != session['username']:
       #   raise Unauthorized()
-      return redirect('/401')
+      return redirect('/404')
 
    user = User.query.get(username)
    db.session.delete(user)
@@ -128,7 +128,7 @@ def add_feedback(username):
    
    if "username" not in session or username != session['username']:
       #   raise Unauthorized()
-      return redirect('/401')
+      return redirect('/404')
 
   
 
@@ -157,7 +157,7 @@ def update_feedback(feedback_id):
    feedback = Feedback.query.get(feedback_id)
    if "username" not in session or feedback.username != session['username']:
         #   raise Unauthorized()
-      return redirect('/401')
+      return redirect('/404')
         
    form = FeedbackForm(obj=feedback)
 
@@ -182,7 +182,7 @@ def delete_feedback(feedback_id):
 
    if "username" not in session or feedback.username != session["username"]:
       #   raise Unauthorized()
-      return redirect('/401')
+      return redirect('/404')
 
    db.session.delete(feedback)
    db.session.commit()
@@ -193,6 +193,6 @@ def delete_feedback(feedback_id):
 def page_not_found(e):
     return render_template('404.html'), 404
 
-@app.errorhandler(401)
-def page_not_found(e):
-    return render_template('401.html'), 401
+# @app.errorhandler(401)
+# def page_not_found(e):
+#     return render_template('401.html'), 401
